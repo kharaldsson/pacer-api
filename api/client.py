@@ -1,7 +1,7 @@
 import pprint
 import json
 import urllib
-import urllib2
+import urllib3
 import json
 import shelve
 '''
@@ -32,60 +32,57 @@ PRESS_KEY_AFTER_CALL = False    # Wait for input before going to the next step
 USE_LOCAL = False				 # For internal development purposes only
 
 ################################################################################
-# The Main API call
+	# The Main API call
 def call(call, method="GET", **kwargs):
-    if method not in ["GET", "POST"]:
-        raise Exception("Expecting a GET or POST request, not: %s"%method)
-    
-    
-    if PRESS_KEY_BEFORE_CALL:
-        raw_input("(press enter to continue)")
-    
-    # Prepare the URL and arguments
-    if USE_LOCAL:
-        base_url = "http://localhost:8080"
-    else:
-        base_url = "https://www.docketalarm.com"
-    url = base_url + api + call + "/"
-    if TESTING:
-        urlargs['test'] = True
-    urlargs = urllib.urlencode(kwargs, doseq=True)
-    if method == "GET":
-        url = url + "?" + urlargs
-    
-    # Allow for debug printing
-    if DEBUG:
-        print("%s: %s"%(method, url))
-        if method == "POST":
-            print("ARGUMENTS: %s"%pprint.pformat(urlargs))
-        
-    # Make the call
-	if _INTERNAL_TESTING:
-		out = _INTERNAL_TESTING(method, url, urlargs)
-	else:
-		response = urllib.urlopen(url) if method == "GET" else \
-			urllib.urlopen(url, urlargs)
-		out = response.read()
-    
-    try:
-        out = json.loads(out)
-    except:
-        raise Exception("Not JSON: " + out)    
-    
-    if DEBUG and out and out.get('error'):
-        print "Error: %s"%out['error']
-    
-    if PRESS_KEY_AFTER_CALL:
-        raw_input("API Call Complete (press enter to continue)")
-        print("")
-    
-    return out
+	if method not in ["GET", "POST"]:
+		raise Exception("Expecting a GET or POST request, not: %s" % method)
+	if PRESS_KEY_BEFORE_CALL:
+		raw_input("(press enter to continue)")
 
-	
+	# Prepare the URL and arguments
+	if USE_LOCAL:
+		base_url = "http://localhost:8080"
+	else:
+		base_url = "https://www.docketalarm.com"
+	url = base_url + api + call + "/"
+	if TESTING:
+		urlargs['test'] = True
+	urlargs = urllib.urlencode(kwargs, doseq=True)
+	if method == "GET":
+		url = url + "?" + urlargs
+
+	# Allow for debug printing
+	if DEBUG:
+		print("%s: %s" % (method, url))
+		if method == "POST":
+			print("ARGUMENTS: %s" % pprint.pformat(urlargs))
+
+		# Make the call
+		if _INTERNAL_TESTING:
+			out = _INTERNAL_TESTING(method, url, urlargs)
+		else:
+			response = urllib.urlopen(url) if method == "GET" else \
+				urllib.urlopen(url, urlargs)
+			out = response.read()
+	try:
+		out = json.loads(out)
+	except:
+		raise Exception("Not JSON: " + out)
+
+	if DEBUG and out and out.get('error'):
+		print("Error: %s" % out['error'])
+
+	if PRESS_KEY_AFTER_CALL:
+		raw_input("API Call Complete (press enter to continue)")
+		print("")
+
+	return out
+
+
 ################################################################################
 #		Utilities and Time Saving Helper Functions
 import time, logging
-from Queue import Empty
+from queue import Empty
 from multiprocessing import Process
 from multiprocessing import Pool as MultiProcessPool
 from multiprocessing import Queue as ProcessQueue
@@ -192,8 +189,8 @@ def getdocket_parallel(username, password, client_matter, docket_list,
 					got += 1
 			except Empty:
 				if save_progress != None:
-					print "Syncing dbase (len=%d), dockets=%d "%(
-						len(save_progress), len(dockets))
+					print ("Syncing dbase (len=%d), dockets=%d "%(
+						len(save_progress), len(dockets)))
 					save_progress.sync()
 				left = len(docket_list) - len(dockets)
 				if left <= 0:
@@ -332,7 +329,7 @@ def search_parallel(username, password, client_matter, q,
 	
 	for i, r in enumerate(results):
 		if not r:
-			print "Missing Result %s"%(i+1)
+			print("Missing Result %s"%(i+1))
 		
 	
 	return {
