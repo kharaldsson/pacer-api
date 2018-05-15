@@ -22,17 +22,19 @@ import pprint
 import os
 import sys
 import urllib
-import urllib2
+import urllib3
 import logging
 
+"""
 # This if statemetn is only really used internally or if you're using it in a 
 # django environment. Most likely, you can delete or ignore.
 if not os.environ.get("DJANGO_SETTINGS_MODULE"):
-	ROOT_PATH = os.path.dirname(__file__)
-	sys.path.append(ROOT_PATH)
-	sys.path.append(os.path.join(ROOT_PATH, '../'))
-	sys.path.append(os.path.join(ROOT_PATH, '../libs/'))
-	os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
+    ROOT_PATH = os.path.dirname(__file__)
+    sys.path.append(ROOT_PATH)
+    sys.path.append(os.path.join(ROOT_PATH, '../'))
+    sys.path.append(os.path.join(ROOT_PATH, '../libs/'))
+    os.environ["DJANGO_SETTINGS_MODULE"] = "settings"
+"""
 
 # The following two imports are necessary to use the Docket Alarm API
 import api
@@ -40,13 +42,13 @@ import api.client
 
 # Turn on logging
 logging.basicConfig(
-	level = logging.DEBUG,
-	format = '%(asctime)s %(levelname)s %(message)s',
+    level=logging.DEBUG,
+    format='%(asctime)s %(levelname)s %(message)s',
 )
 pp = pprint.PrettyPrinter(indent=4)
 
 # You can specify your credentials here rather than at the command prompt.
-username, password = None, None
+username, password = "karl@lexpredict.com", "aIhw%4IwH23J"
 
 ##################################
 # API Client Options
@@ -60,8 +62,8 @@ api.client.PRESS_KEY_AFTER_CALL = True
 # Development Flag, do not use
 api.client.USE_LOCAL = False
 
-def call_api(call, msg=None, get_args=None, post_args=None, 
-                        error_expected=False):
+
+def call_api(call, msg=None, get_args=None, post_args=None, error_expected=False):
     if msg:
         print("")
         print(msg)
@@ -72,7 +74,7 @@ def call_api(call, msg=None, get_args=None, post_args=None,
         method = "POST"
         args = post_args
     else:
-        method="GET"
+        method = "GET"
         args = get_args
     
     out = api.client.call(call=call, method=method, **args)
@@ -87,15 +89,20 @@ def call_api(call, msg=None, get_args=None, post_args=None,
     
     return out
 
+
 def do_print(out):
     return pp.pprint( out )
 
+
 part_no = 1
+
+
 def print_title(msg):
     global part_no
     print("\n\n---------------------------------")
     print("Part %d: %s"%(part_no, msg))
     part_no += 1
+
 
 if __name__ == "__main__":
     print(msg)
@@ -109,9 +116,7 @@ if __name__ == "__main__":
     
     ########
     print_title("Login")
-    out = call_api("login", msg=
-        "First, we'll try logging in with your username and password", 
-        post_args = {'username':username, 'password':password})
+    out = call_api("login", msg="First, we'll try logging in with your username and password", post_args={'username':username, 'password':password})
     login_token = out['login_token']
     bad_court, bad_docket = 'Court of Nowhere district', '123-cv-01234'
     real_court, real_docket = 'Delaware District Court', '1:11-cv-00797'
@@ -119,9 +124,7 @@ if __name__ == "__main__":
     # ########
     if do_search:
         print_title("Searching for Cases")
-        out = call_api("searchpacer", msg=
-                "Now we'll search PACER for all cases in New York where Sony is a party.",
-                get_args = {'login_token': login_token, "client_matter":'',
+        out = call_api("searchpacer", msg="Now we'll search PACER for all cases in New York where Sony is a party.", get_args = {'login_token': login_token, "client_matter":'',
                         'party_name':"Sony", 'court_region' : "New York"})
         out = call_api("searchpacer", msg=
             "There were several pages returned in the previous call. Get the fourth.",
@@ -201,7 +204,6 @@ if __name__ == "__main__":
                         'docket':bad_docket, 'court':bad_court, 
                         'enable':True, 'frequency':'weekly'}, 
                     error_expected=True)
-    
     ########
     # Get Documents
     if False:
@@ -209,4 +211,3 @@ if __name__ == "__main__":
         out = call_api("getdocket", post_args = 
             {'login_token': login_token, "client_matter":'test ' + api,
             'page_token':out['pages'][2]['page_token']})
-    
