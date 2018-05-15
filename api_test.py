@@ -48,7 +48,7 @@ logging.basicConfig(
 pp = pprint.PrettyPrinter(indent=4)
 
 # You can specify your credentials here rather than at the command prompt.
-username, password = "karl@lexpredict.com", "aIhw%4IwH23J"
+username, password = None, None
 
 ##################################
 # API Client Options
