@@ -107,9 +107,9 @@ def print_title(msg):
 if __name__ == "__main__":
     print(msg)
     if not username or password:
-        print("Enter your Docket Alarm username (your email) and password.")
-        username = raw_input("Username: ")
-        password = raw_input("Password: ")
+        #print("Enter your Docket Alarm username (your email) and password.")
+        username = input("Username: ")
+        password = input("Password: ")
         
     do_getdocket, do_search, do_track_test = True, True, False
     # do_getdocket, do_search, do_track_test = False, False, True
