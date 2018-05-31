@@ -1,6 +1,8 @@
 import pprint
 import json
 import urllib
+import urllib.parse
+import urllib.request
 import urllib3
 import json
 import shelve
@@ -37,7 +39,7 @@ def call(call, method="GET", **kwargs):
 	if method not in ["GET", "POST"]:
 		raise Exception("Expecting a GET or POST request, not: %s" % method)
 	if PRESS_KEY_BEFORE_CALL:
-		raw_input("(press enter to continue)")
+		input("(press enter to continue)")
 
 	# Prepare the URL and arguments
 	if USE_LOCAL:
@@ -47,7 +49,7 @@ def call(call, method="GET", **kwargs):
 	url = base_url + api + call + "/"
 	if TESTING:
 		urlargs['test'] = True
-	urlargs = urllib.urlencode(kwargs, doseq=True)
+	urlargs = urllib.parse.urlencode(kwargs, doseq=True).encode("utf-8")
 	if method == "GET":
 		url = url + "?" + urlargs
 
@@ -61,8 +63,8 @@ def call(call, method="GET", **kwargs):
 		if _INTERNAL_TESTING:
 			out = _INTERNAL_TESTING(method, url, urlargs)
 		else:
-			response = urllib.urlopen(url) if method == "GET" else \
-				urllib.urlopen(url, urlargs)
+			response = urllib.request.urlopen(url) if method == "GET" else \
+				urllib.request.urlopen(url, urlargs)
 			out = response.read()
 	try:
 		out = json.loads(out)
@@ -73,7 +75,7 @@ def call(call, method="GET", **kwargs):
 		print("Error: %s" % out['error'])
 
 	if PRESS_KEY_AFTER_CALL:
-		raw_input("API Call Complete (press enter to continue)")
+		input("API Call Complete (press enter to continue)")
 		print("")
 
 	return out
